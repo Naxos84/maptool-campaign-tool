@@ -4,6 +4,8 @@ import { Command } from "commander";
 import extract from "extract-zip";
 import { zip } from "zip-a-folder";
 import path from "path";
+import xml2js from "xml2js";
+import fs from "fs";
 
 const program = new Command();
 
@@ -22,7 +24,7 @@ program
 	)
 	.option("-d, --debug", "show debugging information")
 	.action(
-		(
+		async (
 			src: string,
 			dest: string,
 			options: Record<string, unknown>,
@@ -39,9 +41,25 @@ program
 				console.log("dest", dest);
 			}
 			if (src.endsWith(".cmpgn")) {
-				extract(src, {
+				await extract(src, {
 					dir: path.resolve(dest),
 				});
+				const parser = new xml2js.Parser();
+				try {
+					const data = await fs.promises.readFile(`${dest}/properties.xml`);
+					const result = await parser.parseStringPromise(data);
+					console.log(JSON.stringify(result));
+					const [key, value] = result.map.entry[0].string;
+					result.map.entry[0].string = [key, `${value}_modified`];
+					const builder = new xml2js.Builder({ headless: true });
+					const target = path.resolve(`${dest}/properties_copy.xml`);
+					console.log("Writing to", target);
+					await fs.promises.writeFile(target, builder.buildObject(result), {});
+					console.log("Written file", target);
+				} catch (e) {
+					console.error(e);
+				}
+				fs.readFile(`${dest}/properties.xml`, (err, data) => {});
 			} else {
 				console.error(
 					"Invalid file name. Maptool campaigns should end with '.cmpgn'",
