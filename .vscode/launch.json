@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Split campaign",
+            "program": "${workspaceFolder}/src/index.ts",
+            "args": [
+                "split",
+                "./testData/DSA5 Regelsatz.cmpgn",
+                "./testData/output2"
+            ],
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Merge campaign",
+            "program": "${workspaceFolder}/src/index.ts",
+            "args": [
+                "merge",
+                "./testData/output2",
+                "./testData/DSA5 Regelsatz.cmpgn"
+            ],
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        }
+    ]
+}

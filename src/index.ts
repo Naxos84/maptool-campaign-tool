@@ -44,18 +44,23 @@ program
 				await extract(src, {
 					dir: path.resolve(dest),
 				});
-				const parser = new xml2js.Parser();
+				const parser = new xml2js.Parser({ explicitArray: false });
 				try {
-					const data = await fs.promises.readFile(`${dest}/properties.xml`);
-					const result = await parser.parseStringPromise(data);
-					console.log(JSON.stringify(result));
-					const [key, value] = result.map.entry[0].string;
-					result.map.entry[0].string = [key, `${value}_modified`];
-					const builder = new xml2js.Builder({ headless: true });
-					const target = path.resolve(`${dest}/properties_copy.xml`);
-					console.log("Writing to", target);
-					await fs.promises.writeFile(target, builder.buildObject(result), {});
-					console.log("Written file", target);
+					const data = await fs.promises.readFile(`${dest}/content.xml`);
+					const result: CampaignDocument = await parser.parseStringPromise(
+						data,
+					);
+					console.log("Found campaign with Id", getCampaignId(result));
+					const campaign =
+						result[
+							"net.rptools.maptool.util.PersistenceUtil_-PersistedCampaign"
+						].campaign;
+					let macroCount = 0;
+					macroCount += countTokenMacros(campaign);
+					macroCount += countCampaignMacros(campaign);
+					macroCount += countGameMasterMacros(campaign);
+
+					console.log(`Found ${macroCount} macros`);
 				} catch (e) {
 					console.error(e);
 				}
@@ -110,3 +115,35 @@ program
 	);
 
 program.parse();
+
+function getCampaignId(data: CampaignDocument) {
+	return data["net.rptools.maptool.util.PersistenceUtil_-PersistedCampaign"]
+		.campaign.id.baGUID;
+}
+
+function countTokenMacros(campaign: Campaign): number {
+	let result = 0;
+	for (let token of campaign.zones["java.util.Collections_-SynchronizedMap"][
+		"default"
+	].m.entry["net.rptools.maptool.model.Zone"].tokenMap.entry) {
+		const macroPropertiesMap =
+			token["net.rptools.maptool.model.Token"].macroPropertiesMap;
+		if (typeof macroPropertiesMap !== "string" && macroPropertiesMap.entry) {
+			result += macroPropertiesMap.entry.length;
+		}
+	}
+
+	return result;
+}
+
+function countCampaignMacros(campaign: Campaign): number {
+	return campaign.macroButtonProperties[
+		"net.rptools.maptool.model.MacroButtonProperties"
+	].length;
+}
+
+function countGameMasterMacros(campaign: Campaign): number {
+	return campaign.gmMacroButtonProperties[
+		"net.rptools.maptool.model.MacroButtonProperties"
+	].length;
+}
