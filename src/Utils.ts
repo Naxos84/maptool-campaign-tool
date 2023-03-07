@@ -1,5 +1,5 @@
 import fs from "fs";
-import { decodeXML } from "entities";
+import { decodeHTML } from "entities";
 import {
 	Campaign,
 	MacroButtonProperties,
@@ -71,12 +71,16 @@ export default class {
 		}
 	}
 
-	async writeMacro(path: string, meta: object, command: EscapedXmlString) {
+	private async writeMacro(
+		path: string,
+		meta: object,
+		command: EscapedXmlString,
+	) {
 		await fs.promises.writeFile(
 			`${path}/meta.json`,
 			JSON.stringify(meta, null, 2),
 		);
-		await fs.promises.writeFile(`${path}/command.mtm`, decodeXML(command));
+		await fs.promises.writeFile(`${path}/command.mtm`, decodeHTML(command));
 	}
 
 	getCampaignMacros(): MacroButtonProperties[] {
