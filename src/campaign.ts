@@ -1,22 +1,22 @@
-type CampaignDocument = {
+export type CampaignDocument = {
 	"net.rptools.maptool.util.PersistenceUtil_-PersistedCampaign": PersistedCampaign;
 };
 
-type PersistedCampaign = {
+export type PersistedCampaign = {
 	assetMap: AssetMap;
 	campaign: Campaign;
 	currentView: CurrentView;
 	currentZoneId: CurrentZoneId;
 };
 
-type AssetMap = AssetMapEntry[];
-type AssetMapEntry = {
+export type AssetMap = AssetMapEntry[];
+export type AssetMapEntry = {
 	entry: {
 		"net.rptools.lib.MD5Key": Reference;
 		null: unknown;
 	};
 };
-type Campaign = {
+export type Campaign = {
 	id: GUID;
 	campaignProperties: CampaignProperties;
 	exportSettings: unknown;
@@ -32,7 +32,7 @@ type Campaign = {
 	zones: Zones;
 };
 
-type CampaignProperties = {
+export type CampaignProperties = {
 	characterSheets: List<{ string: string[] }>;
 	defaultSightType: string; //TODO
 	initiativeMovementLock: boolean;
@@ -47,40 +47,40 @@ type CampaignProperties = {
 	tokenStates: Class & List<TokenState>;
 	tokenTypeMap: List<TokenType>;
 };
-type TokenType = {
+export type TokenType = {
 	string: string;
 	list: {
 		"net.rptools.maptool.model.TokenProperty": TokenProperty[];
 	};
 };
-type TokenProperty = {
+export type TokenProperty = {
 	name: string;
 	highPriority: boolean;
 	ownerOnly: boolean;
 	gmOnly: boolean;
 	defaultValue?: number;
 };
-type TokenState = {
+export type TokenState = {
 	string: string;
 	"net.rptools.maptool.client.ui.token.FlowImageTokenOverlay": FlowImageTokenOverlay;
 };
-type FlowImageTokenOverlay = TokenOverlay & {
+export type FlowImageTokenOverlay = TokenOverlay & {
 	group: unknown;
 	showOwner: boolean;
 	assetId: ID;
 	grid: number;
 };
-type TokenBar = {
+export type TokenBar = {
 	string: string;
 	"net.rptools.maptool.client.ui.token.TwoImageBarTokenOverlay": TwoImageBarTokenOverlay;
 };
-type TwoImageBarTokenOverlay = TokenOverlay & {
+export type TwoImageBarTokenOverlay = TokenOverlay & {
 	increments: number;
 	side: string; //TODO
 	bottomAssetId: ID;
 	topAssetId: ID;
 };
-type TokenOverlay = {
+export type TokenOverlay = {
 	name: string;
 	order: number;
 	mouseover: boolean;
@@ -88,12 +88,12 @@ type TokenOverlay = {
 	showGM: boolean;
 	showOthers: boolean;
 };
-type SightTypeEntry = {
+export type SightTypeEntry = {
 	string: string;
 	"net.rptools.maptool.model.SightType": SightType;
 };
 //TODO check compatibility with LightSource
-type SightType = {
+export type SightType = {
 	name: string;
 	multiplier: number;
 	personalLightSource: PersonalLightSource;
@@ -103,7 +103,7 @@ type SightType = {
 	offset: number;
 	scaleWithToken: boolean;
 };
-type PersonalLightSource = {
+export type PersonalLightSource = {
 	lightList: {
 		"net.rptools.maptool.model.Light": Light;
 	};
@@ -112,12 +112,12 @@ type PersonalLightSource = {
 	lumens: number;
 	scaleWithToken: boolean;
 };
-type LookupTableMap = List<LookupTableMapEntry>;
-type LookupTableMapEntry = {
+export type LookupTableMap = List<LookupTableMapEntry>;
+export type LookupTableMapEntry = {
 	string: string;
 	"net.rptools.maptool.model.LookupTable": LookupTable;
 };
-type LookupTable = {
+export type LookupTable = {
 	entryList: LookupTableEntry[];
 	name: string;
 	defaultRoll: number;
@@ -125,7 +125,7 @@ type LookupTable = {
 	allowLookup: boolean;
 	pickOnce: boolean;
 };
-type LookupTableEntry = {
+export type LookupTableEntry = {
 	"net.rptools.maptool.model.LookupTable_-LookupEntry": {
 		min: number;
 		max: number;
@@ -134,24 +134,24 @@ type LookupTableEntry = {
 		imageId: ID;
 	};
 };
-type ID = {
+export type ID = {
 	id: string;
 };
-type LightSourcesMap = Class & {
+export type LightSourcesMap = Class & {
 	entry: {
 		string: string;
 		map: List<LightSourcesMapEntry>;
 	};
 };
 
-type LightSourcesMapEntry = {
+export type LightSourcesMapEntry = {
 	"net.rptools.maptool.model.GUID": GUID;
 	"net.rptools.maptool.model.LightSource": LightSource;
 };
-type GUID = {
+export type GUID = {
 	baGUID: string;
 };
-type LightSource = {
+export type LightSource = {
 	lightList: Light[];
 	name: string;
 	id: Reference;
@@ -160,7 +160,7 @@ type LightSource = {
 	lumens: number;
 	scaleWithToken: boolean;
 };
-type Light = {
+export type Light = {
 	paint: Class & { color: number };
 	facingOffset: number;
 	radius: number;
@@ -169,7 +169,7 @@ type Light = {
 	isGM: boolean;
 	ownerOnly: boolean;
 };
-type ButtonProperties = {
+export type ButtonProperties = {
 	macroUUID: string;
 	index: number;
 	colorKey: "default" | unknown;
@@ -195,25 +195,25 @@ type ButtonProperties = {
 	compareAutoExecute: boolean;
 	compareApplyToSelectedTokens: boolean;
 };
-type GameMasterMacroButtonProperties = ButtonProperties & {
-	saveLocation: "GmPanel";
+export type GameMasterMacroButtonProperties = ButtonProperties & {
+	readonly saveLocation: "GmPanel";
 };
-type MacroButtonProperties = ButtonProperties & {
-	saveLocation: "CampaignPanel" | "Token";
+export type MacroButtonProperties = ButtonProperties & {
+	readonly saveLocation: "CampaignPanel" | "Token";
 };
-type Zones = Class & {
+export type Zones = Class & {
 	"java.util.Collections_-SynchronizedMap": {
 		default: {
-			m: Class & { entry: ZoneEntry };
+			m: Class & List<ZoneEntry>;
 			mutex: Class & Reference;
 		};
 	};
 };
-type ZoneEntry = {
+export type ZoneEntry = {
 	"net.rptools.maptool.model.GUID": GUID;
 	"net.rptools.maptool.model.Zone": Zone;
 };
-type Zone = {
+export type Zone = {
 	creationTime: number;
 	id: Reference;
 	grid: Grid;
@@ -250,33 +250,33 @@ type Zone = {
 	height: number;
 	width: number;
 };
-type Grid = Class & {
+export type Grid = Class & {
 	offsetX: number;
 	offsetY: number;
 	size: number;
 	zone: Reference;
 	//TODO
 };
-type TopologyTypes = {
+export type TopologyTypes = {
 	topologyTypes: {
 		"net.rptools.maptool.model.Zone_-TopologyType": string;
 	};
 };
-type Drawables = {
+export type Drawables = {
 	"net.rptools.maptool.model.drawing.DrawnElement": DrawnElement;
 };
-type DrawnElement = {
+export type DrawnElement = {
 	drawable: Class & Drawable;
 	pet: Pen;
 };
-type Drawable = {
+export type Drawable = {
 	id: GUID;
 	layer: string; //TODO
 	points: unknown;
 	width: number;
 	squareCap: boolean;
 };
-type Pen = {
+export type Pen = {
 	foregroundMode: number;
 	paint: Class & { color: number };
 	backgroundMode: number;
@@ -288,12 +288,12 @@ type Pen = {
 	color: number;
 	backgroundColor: number;
 };
-type TokenMap = List<TokenMapEntry>;
-type TokenMapEntry = {
+export type TokenMap = List<TokenMapEntry>;
+export type TokenMapEntry = {
 	"net.rptools.maptool.model.GUID": GUID;
 	"net.rptools.maptool.model.Token": Token;
 };
-type Token = {
+export type Token = {
 	id: Reference;
 	beingImpersonated: boolean;
 	exposedAreaGUID: GUID;
@@ -343,61 +343,61 @@ type Token = {
 	speechMap: unknown;
 	allowURIAccess: boolean;
 };
-type MacroPropertiesMapEntry = {
+export type MacroPropertiesMapEntry = {
 	int: number;
 	"net.rptools.maptool.model.MacroButtonProperties": MacroButtonProperties;
 };
-type PropertyMap = {
+export type PropertyMap = {
 	store: List<PropertyMapEntry>;
 };
-type PropertyMapEntry = {
+export type PropertyMapEntry = {
 	string: string;
 	"net.rptools.CaseInsensitiveHashMap_-KeyValue": {
 		key: string;
 		"outer-class": Reference;
 	};
 };
-type SizeMapEntry = {
+export type SizeMapEntry = {
 	string: string;
 	"net.rptools.maptool.model.GUID": GUID;
 };
-type ImageAssetMapEntry = {
+export type ImageAssetMapEntry = {
 	null: unknown;
 	"net.rptools.lib.MD5Key": MD5Key;
 };
-type MD5Key = {
+export type MD5Key = {
 	id: string;
 };
-type ExposedAreaMeta = List<ExposedAreaMetaEntry>;
-type ExposedAreaMetaEntry = {
+export type ExposedAreaMeta = List<ExposedAreaMetaEntry>;
+export type ExposedAreaMetaEntry = {
 	"net.rptools.maptool.model.GUID": GUID;
 	"net.rptools.maptool.model.ExposedAreaMetaData": unknown;
 };
-type TokenOrderedList = Class & TokenReference[];
-type TokenReference = {
+export type TokenOrderedList = Class & TokenReference[];
+export type TokenReference = {
 	"net.rptools.maptool.model.Token": Reference;
 };
-type InitiativeList = {
+export type InitiativeList = {
 	//TODO if needed
 };
-type ExposedArea = {
+export type ExposedArea = {
 	//TODO if needed
 };
-type FogPaint = Class & { color: number };
-type Topology = Curves;
-type Curves = {
+export type FogPaint = Class & { color: number };
+export type Topology = Curves;
+export type Curves = {
 	curves: Reference;
 };
-type TopologyTerrain = Curves;
-type BackgroundPaint = Class & {
+export type TopologyTerrain = Curves;
+export type BackgroundPaint = Class & {
 	assetId: ID;
 	scale: number;
 };
-type BoardPosition = {
+export type BoardPosition = {
 	x: number;
 	y: number;
 };
-type CurrentView = {
+export type CurrentView = {
 	oneToOneScale: number;
 	scale: number;
 	scaleIncrement: number;
@@ -409,21 +409,21 @@ type CurrentView = {
 	initialized: boolean;
 };
 
-type CurrentZoneId = Reference;
+export type CurrentZoneId = Reference;
 
-type Class = {
+export type Class = {
 	$: {
 		readonly class: string;
 	};
 };
-type Reference = {
+export type Reference = {
 	$: {
 		readonly reference: string;
 	};
 };
 
-type EscapedXmlString = string;
+export type EscapedXmlString = string;
 
-type List<V> = {
-	entry: V[];
+export type List<V> = {
+	entry: V | V[];
 };

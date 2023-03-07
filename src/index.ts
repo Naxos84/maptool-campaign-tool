@@ -6,6 +6,14 @@ import { zip } from "zip-a-folder";
 import path from "path";
 import xml2js from "xml2js";
 import fs from "fs";
+import inquirer, { QuestionCollection } from "inquirer";
+
+import type {
+	Campaign,
+	CampaignDocument,
+	MacroButtonProperties,
+} from "./campaign.js";
+import Utils from "./Utils.js";
 
 const program = new Command();
 
@@ -41,30 +49,55 @@ program
 				console.log("dest", dest);
 			}
 			if (src.endsWith(".cmpgn")) {
+				const dir = path.resolve(`${dest}/original`);
 				await extract(src, {
-					dir: path.resolve(dest),
+					dir,
 				});
+				console.log("Extraced files to", dir);
 				const parser = new xml2js.Parser({ explicitArray: false });
 				try {
-					const data = await fs.promises.readFile(`${dest}/content.xml`);
+					const pathToOriginalCampaign = `${dest}/original/content.xml`;
+					const data = await fs.promises.readFile(pathToOriginalCampaign);
 					const result: CampaignDocument = await parser.parseStringPromise(
 						data,
 					);
-					console.log("Found campaign with Id", getCampaignId(result));
+					console.log("Parsed campaign from", pathToOriginalCampaign);
+					const campaignId = getCampaignId(result);
+					const campaignPath = `${dest}/campaign-${campaignId}`;
+					if (fs.existsSync(campaignPath)) {
+						const questions: QuestionCollection = [
+							{
+								type: "input",
+								name: "overwrite",
+								message: "The parsed campaign already exists. Overwrite? (n/y)",
+								default: "y",
+								filter: (input, answers) => {
+									return input.toLowerCase() === "y";
+								},
+							},
+						];
+						const answers = await inquirer.prompt(questions);
+						console.log(JSON.stringify(answers));
+						if (answers.overwrite) {
+							console.log("Clearing target directory");
+							await fs.promises.rm(campaignPath, { recursive: true });
+							await fs.promises.mkdir(campaignPath);
+						}
+					} else {
+						await fs.promises.mkdir(campaignPath);
+					}
 					const campaign =
 						result[
 							"net.rptools.maptool.util.PersistenceUtil_-PersistedCampaign"
 						].campaign;
-					let macroCount = 0;
-					macroCount += countTokenMacros(campaign);
-					macroCount += countCampaignMacros(campaign);
-					macroCount += countGameMasterMacros(campaign);
-
-					console.log(`Found ${macroCount} macros`);
+					const utils = new Utils(campaign);
+					await utils.writeCampaignMacros(campaignPath);
+					await utils.writeGamemasterMacros(campaignPath);
+					await utils.writeTokens(campaignPath);
+					console.log("Splitting campaign finished");
 				} catch (e) {
 					console.error(e);
 				}
-				fs.readFile(`${dest}/properties.xml`, (err, data) => {});
 			} else {
 				console.error(
 					"Invalid file name. Maptool campaigns should end with '.cmpgn'",
@@ -119,31 +152,4 @@ program.parse();
 function getCampaignId(data: CampaignDocument) {
 	return data["net.rptools.maptool.util.PersistenceUtil_-PersistedCampaign"]
 		.campaign.id.baGUID;
-}
-
-function countTokenMacros(campaign: Campaign): number {
-	let result = 0;
-	for (let token of campaign.zones["java.util.Collections_-SynchronizedMap"][
-		"default"
-	].m.entry["net.rptools.maptool.model.Zone"].tokenMap.entry) {
-		const macroPropertiesMap =
-			token["net.rptools.maptool.model.Token"].macroPropertiesMap;
-		if (typeof macroPropertiesMap !== "string" && macroPropertiesMap.entry) {
-			result += macroPropertiesMap.entry.length;
-		}
-	}
-
-	return result;
-}
-
-function countCampaignMacros(campaign: Campaign): number {
-	return campaign.macroButtonProperties[
-		"net.rptools.maptool.model.MacroButtonProperties"
-	].length;
-}
-
-function countGameMasterMacros(campaign: Campaign): number {
-	return campaign.gmMacroButtonProperties[
-		"net.rptools.maptool.model.MacroButtonProperties"
-	].length;
 }

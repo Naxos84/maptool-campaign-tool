@@ -2,7 +2,11 @@
   "name": "maptools-campaign-editor",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "exports": "./dist/index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=14.16"
+  },
   "bin": {
     "maptool-campaign-tool": "./dist/index.js"
   },
@@ -14,7 +18,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cli-progress": "^3.12.0",
     "commander": "^10.0.0",
+    "entities": "^4.4.0",
     "extract-zip": "^2.0.1",
     "htmlparser2": "^8.0.1",
     "inquirer": "^9.1.4",
@@ -22,6 +28,7 @@
     "zip-a-folder": "^1.1.5"
   },
   "devDependencies": {
+    "@types/cli-progress": "^3.11.0",
     "@types/inquirer": "^9.0.3",
     "@types/node": "^18.14.6",
     "@types/xml2js": "^0.4.11",
